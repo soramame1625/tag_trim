@@ -1,0 +1,216 @@
+スクリプトは 2018年04月19日 22時51分59秒
+ に開始しました]0;indigo@indigo-VirtualBox: ~/catkin_ws/src/worker_pkgindigo@indigo-VirtualBox:~/catkin_ws/src/worker_pkg$ ls
+CMakeLists.txt  [0m[01;34minclude[0m  [01;34mlaunch[0m  package.xml  [01;34mscripts[0m  [01;34msrc[0m  typescript
+]0;indigo@indigo-VirtualBox: ~/catkin_ws/src/worker_pkgindigo@indigo-VirtualBox:~/catkin_ws/src/worker_pkg$ cd scripts/
+]0;indigo@indigo-VirtualBox: ~/catkin_ws/src/worker_pkg/scriptsindigo@indigo-VirtualBox:~/catkin_ws/src/worker_pkg/scripts$ ls
+[0m[01;32mjoy_twist.py[0m  [01;32mtag_position.py[0m
+]0;indigo@indigo-VirtualBox: ~/catkin_ws/src/worker_pkg/scriptsindigo@indigo-VirtualBox:~/catkin_ws/src/worker_pkg/scripts$ cd[K[Kvi tag_position.py 
+[?1049h[?1h=[1;48r[?12;25h[?12l[?25h[27m[m[H[2J[?25l[48;1H"tag_position.py" 124L, 5953C[>c[1;1H[33m  1 [m[34m#!/usr/bin/env python[m[1m[34m↲[m
+[33m  2 [m[35mimport[m rospy[1m[34m↲[m
+[33m  3 [m[35mfrom[m apriltags2_ros.msg [35mimport[m AprilTagDetectionArray[1m[34m↲[m
+[33m  4 [m[35mfrom[m std_msgs.msg [35mimport[m String[1m[34m↲[m
+[33m  5 [m[35mfrom[m std_msgs.msg [35mimport[m Float64MultiArray[1m[34m↲[m
+[33m  6 [m[35mfrom[m std_msgs.msg [35mimport[m Int16[1m[34m↲[m
+[33m  7 [m[35mimport[m numpy [33mas[m np[1m[34m↲[m
+[33m  8 [m[1m[34m↲[m
+[33m  9 [m[35mimport[m tf[1m[34m↲[m
+[33m 10 [m[35mimport[m geometry_msgs.msg[1m[34m↲[m
+[33m 11 [m[35mimport[m math[1m[34m↲[m
+[33m 12 [m[1m[34m↲[m
+[33m 13 class[m [36mTag_taker[m([36mobject[m):[1m[34m↲[m
+[33m 14 [m    [33mdef[m [36m__init__[m(self):[1m[34m↲[m
+[33m 15 [m[8Crospy.init_node([31m'tag_position'[m)[1m[34m↲[m
+[33m 16 [m[8Cself._ap_data = np.zeros(([31m2[m,[31m7[m), dtype = [31m'float64'[m)[1m[34m↲[m
+[33m 17 [m[8Cself.cm_data = np.zeros([31m7[m, dtype = [31m'float64'[m)[1m[34m↲[m
+[33m 18 [m[8Cself.position_data = np.zeros([31m6[m, dtype = [31m'float64'[m)[1m[34m↲[m
+[33m 19 [m[8Cself.tags_state = [31m0[m[1m[34m↲[m
+[33m 20 [m[8Cself.listener = tf.TransformListener()[1m[34m↲[m
+[33m 21 [m[1m[34m↲[m
+[33m 22 [m[8Cself.pub_0 = rospy.Publisher([31m'/tag_point'[m, Float64MultiArray, queue_size=[31m10[m)[1m[34m↲[m
+[33m 23 [m[8Cself.pub_1 = rospy.Publisher([31m'/cam_point'[m, Float64MultiArray, queue_size=[31m10[m)[1m[34m↲[m
+[33m 24 [m[8Cself.pub_3 = rospy.Publisher([31m'/tags_state'[m, Int16, queue_size=[31m10[m)[1m[34m↲[m
+[33m 25 [m[8Cself.sub = rospy.Subscriber([31m'/tag_detections'[m,AprilTagDetectionArray,self.callback)[1m[34m↲[m
+[33m 26 [m[8Crospy.spin()[1m[34m↲[m
+[33m 27 [m[1m[34m↲[m
+[33m 28 [m    [33mdef[m [36mget_pose[m(self,p_list, name):[1m[34m↲[m
+[33m 29 [m[8Cbr = tf.TransformBroadcaster()[1m[34m↲[m
+[33m 30 [m[8Cbr.sendTransform([1m[34m↲[m
+[33m 31 [m[12Cp_list[[31m0[m:[31m3[m],[1m[34m↲[m
+[33m 32 [m[12Cp_list[[31m3[m:[31m7[m],[1m[34m↲[m
+[33m 33 [m[12Crospy.Time.now(),[1m[34m↲[m
+[33m 34 [m[12Cname,[1m[34m↲[m
+[33m 35 [m[12C[31m'usb_cam'[m)[1m[34m↲[m
+[33m 36 [m[1m[34m↲[m
+[33m 37 [m    [33mdef[m [36mchange_angle[m(self,quaternion):[1m[34m↲[m
+[33m 38 [m[8C[34m#External parameters[m[1m[34m↲[m
+[33m 39 [m[8Ce = tf.transformations.euler_from_quaternion(quaternion)    [34m#change angle[m[1m[34m↲[m
+[33m 40 [8Creturn[m e[1m[34m↲[m
+[33m 41 [m[1m[34m↲[m
+[33m 42 [m    [33mdef[m [36mpublish_tag[m(self,list_data):[1m[34m↲[m
+[33m 43 [m[8Cposition_list = Float64MultiArray()[1m[34m↲[m
+[33m 44 [m[8Cposition_list.data = list_data[1m[34m↲[m
+[33m 45 [m[8Cself.pub_0.publish(position_list)[1m[34m↲[m
+[33m 46 [m[1m[34m↲[m
+[33m 47 [m    [33mdef[m [36mpublish_cam[m(self,list_data):[1m[34m↲[m[48;165H1,1[10C先頭]2;tag_position.py (~/catkin_ws/src/worker_pkg/scripts) - VIM]1;tag_position.py[1;5H[?12l[?25hP+q436f\P+q6b75\P+q6b64\P+q6b72\P+q6b6c\P+q2332\P+q2334\P+q2569\P+q2a37\P+q6b31\[?25l[27m[m[H[2J[1;1H[33m 78 [m[16Cself._ap_data[[31m1[m][[31m4[m] = messege.detections[[31m0[m].pose.pose.pose.orientation.y[1m[34m↲[m
+[33m 79 [m[16Cself._ap_data[[31m1[m][[31m5[m] = messege.detections[[31m0[m].pose.pose.pose.orientation.z[1m[34m↲[m
+[33m 80 [m[16Cself._ap_data[[31m1[m][[31m6[m] = messege.detections[[31m0[m].pose.pose.pose.orientation.w[1m[34m↲[m
+[33m 81 [m[16Cself.tags_state = [31m2[m[1m[34m↲[m
+[33m 82 [8Cif[m tags == [31m2[m:[1m[34m↲[m
+[33m 83 [12Cfor[m i [33min[m [36mrange[m([31m2[m):[1m[34m↲[m
+[33m 84 [16Cif[m messege.detections[i].[36mid[m[[31m0[m] == [31m0[m:[1m[34m↲[m
+[33m 85 [m[20Cself._ap_data[[31m0[m][[31m0[m] = messege.detections[i].pose.pose.pose.position.x[1m[34m↲[m
+[33m 86 [m[20Cself._ap_data[[31m0[m][[31m1[m] = messege.detections[i].pose.pose.pose.position.y[1m[34m↲[m
+[33m 87 [m[20Cself._ap_data[[31m0[m][[31m2[m] = messege.detections[i].pose.pose.pose.position.z[1m[34m↲[m
+[33m 88 [m[20Cself._ap_data[[31m0[m][[31m3[m] = messege.detections[i].pose.pose.pose.orientation.x[1m[34m↲[m
+[33m 89 [m[20Cself._ap_data[[31m0[m][[31m4[m] = messege.detections[i].pose.pose.pose.orientation.y[1m[34m↲[m
+[33m 90 [m[20Cself._ap_data[[31m0[m][[31m5[m] = messege.detections[i].pose.pose.pose.orientation.z[1m[34m↲[m
+[33m 91 [m[20Cself._ap_data[[31m0[m][[31m6[m] = messege.detections[i].pose.pose.pose.orientation.w[1m[34m↲[m
+[33m 92 [m[1m[34m↲[m
+[33m 93 [16Cif[m messege.detections[i].[36mid[m[[31m0[m] == [31m1[m:[1m[34m↲[m
+[33m 94 [m[20Cself._ap_data[[31m1[m][[31m0[m] = messege.detections[i].pose.pose.pose.position.x[1m[34m↲[m
+[33m 95 [m[20Cself._ap_data[[31m1[m][[31m1[m] = messege.detections[i].pose.pose.pose.position.y[1m[34m↲[m
+[33m 96 [m[20Cself._ap_data[[31m1[m][[31m2[m] = messege.detections[i].pose.pose.pose.position.z[1m[34m↲[m
+[33m 97 [m[20Cself._ap_data[[31m1[m][[31m3[m] = messege.detections[i].pose.pose.pose.orientation.x[1m[34m↲[m
+[33m 98 [m[20Cself._ap_data[[31m1[m][[31m4[m] = messege.detections[i].pose.pose.pose.orientation.y[1m[34m↲[m
+[33m 99 [m[20Cself._ap_data[[31m1[m][[31m5[m] = messege.detections[i].pose.pose.pose.orientation.z[1m[34m↲[m
+[33m100 [m[20Cself._ap_data[[31m1[m][[31m6[m] = messege.detections[i].pose.pose.pose.orientation.w[1m[34m↲[m
+[33m101 [m[20Cself.tags_state = [31m3[m[1m[34m↲[m
+[33m102 [m[8Cself.get_pose(self._ap_data[[31m1[m],[31m"base"[m)[1m[34m↲[m
+[33m103 [8Ctry[m:[1m[34m↲[m
+[33m104 [m[12C(trans0,rot0) = self.listener.lookupTransform([31m'base'[m, [31m'tag0'[m, rospy.Time([31m0[m))[1m[34m↲[m
+[33m105 [m[12Cself.position_data = trans0 + [36mlist[m(self.change_angle(rot0))[1m[34m↲[m
+[33m106 [m[12C[36mprint[m [31m'ID:0 position '[m,self.position_data[[31m0[m:[31m3[m][1m[34m↲[m
+[33m107 [m[12C[36mprint[m [31m'ID:0 theta    '[m,math.degrees(self.position_data[[31m5[m])[1m[34m↲[m
+[33m108 [m[12C(trans1,rot1) = self.listener.lookupTransform([31m'base'[m, [31m'usb_cam'[m, rospy.Time([31m0[m))[1m[34m↲[m
+[33m109 [m[12Cself.camera_data = trans1 + [36mlist[m(self.change_angle(rot1))[1m[34m↲[m
+[33m110 [m[12C[36mprint[m [31m'cm:0 position'[m,self.camera_data[[31m0[m:[31m3[m][1m[34m↲[m
+[33m111 [m[12C[36mprint[m [31m'cm:0 angle'[m,math.degrees(self.camera_data[[31m3[m])[1m[34m↲[m
+[33m112 [m[12C[36mprint[m [31m'cm:0 angle'[m,math.degrees(self.camera_data[[31m4[m])[1m[34m↲[m
+[33m113 [m[12C[36mprint[m [31m'cm:0 angle'[m,math.degrees(self.camera_data[[31m5[m])[1m[34m↲[m
+[33m114 [m[1m[34m↲[m
+[33m115 [m[12Cself.publish_cam(self.camera_data)[1m[34m↲[m
+[33m116 [m[12Cself.publish_tag(self.position_data)[1m[34m↲[m
+[33m117 [m[12Cself.publish_tags_state(self.tags_state)[1m[34m↲[m
+[33m118 [m[1m[34m↲[m
+[33m119 [8Cexcept[m (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):[1m[34m↲[m
+[33m120 [12Cpass[m[1m[34m↲[m
+[33m121 [m[1m[34m↲[m
+[33m122 if[m __name__ == [31m"__main__"[m:[1m[34m↲[m
+[33m123 [m    tag_taker = Tag_taker()[1m[34m↲[m
+[33m124 [m[1m[34m↲[m[48;165H124,0-1      末尾[47;5H[?12l[?25h[?25l[48;167H3,1  [46;5H[?12l[?25h[?25l[48;167H2[45;5H[?12l[?25h[?25l[48;167H1,0-1[44;5H[?12l[?25h[?25l[48;167H0,1  [43;5H[?12l[?25h[?25l[48;166H19[42;5H[?12l[?25h[?25l[48;167H8,0-1[41;5H[?12l[?25h[?25l[48;167H7,1  [40;5H[?12l[?25h[?25l[48;167H6[39;5H[?12l[?25h[?25l[48;167H5[38;5H[?12l[?25h[?25l[48;167H4,0-1[37;5H[?12l[?25h[?25l[48;167H3,1  [36;5H[?12l[?25h[?25l[48;167H2[35;5H[?12l[?25h[?25l[48;167H1[34;5H[?12l[?25h[?25l[48;167H0[33;5H[?12l[?25h[?25l[48;166H09[32;5H[?12l[?25h[?25l[48;167H8[31;5H[?12l[?25h[?25l[48;167H7[30;5H[?12l[?25h[?25l[48;167H6[29;5H[?12l[?25h[?25l[48;167H5[28;5H[?12l[?25h[?25l[48;167H4[27;5H[?12l[?25h[?25l[48;167H3[26;5H[?12l[?25h[?25l[48;167H2[25;5H[?12l[?25h[?25l[48;167H1[24;5H[?12l[?25h[?25l[48;167H0[23;5H[?12l[?25h[?25l[48;165H99,1 [22;5H[?12l[?25h[?25l[48;166H8[21;5H[?12l[?25h[?25l[48;166H7[20;5H[?12l[?25h[?25l[48;166H6[19;5H[?12l[?25h[?25l[48;166H5[18;5H[?12l[?25h[?25l[48;166H4[17;5H[?12l[?25h[?25l[48;166H3[16;5H[?12l[?25h[?25l[48;166H2,0-1[15;5H[?12l[?25h[?25l[48;166H1,1  [14;5H[?12l[?25h[?25l[48;166H0[13;5H[?12l[?25h[?25l[48;165H89[12;5H[?12l[?25h[?25l[48;166H8[11;5H[?12l[?25h[?25l[48;166H7[10;5H[?12l[?25h[?25l[48;166H6[9;5H[?12l[?25h[?25l[48;166H5[8;5H[?12l[?25h[?25l[48;166H4[7;5H[?12l[?25h[?25l[48;166H3[6;5H[?12l[?25h[?25l[48;166H2[5;5H[?12l[?25h[?25l[48;166H1[4;5H[?12l[?25h[?25l[48;166H0[3;5H[?12l[?25h[?25l[48;165H79[2;5H[?12l[?25h[?25l[48;165H80[3;5H[?12l[?25h[?25l[48;166H1[4;5H[?12l[?25h[?25l[48;166H2[5;5H[?12l[?25h[?25l[48;166H3[6;5H[?12l[?25h[?25l[48;166H4[7;5H[?12l[?25h[?25l[48;166H5[8;5H[?12l[?25h[?25l[48;166H6[9;5H[?12l[?25h[?25l[48;166H7[10;5H[?12l[?25h[?25l[48;166H8[11;5H[?12l[?25h[?25l[48;166H9[12;5H[?12l[?25h[?25l[48;165H90[13;5H[?12l[?25h[?25l[48;166H1[14;5H[?12l[?25h[?25l[48;166H2,0-1[15;5H[?12l[?25h[?25l[48;166H3,1  [16;5H[?12l[?25h[?25l[48;166H4[17;5H[?12l[?25h[?25l[48;166H5[18;5H[?12l[?25h[?25l[48;166H6[19;5H[?12l[?25h[?25l[48;166H7[20;5H[?12l[?25h[?25l[48;166H8[21;5H[?12l[?25h[?25l[48;166H9[22;5H[?12l[?25h[?25l[48;165H100,1[23;5H[?12l[?25h[?25l[48;167H1[24;5H[?12l[?25h[?25l[48;167H2[25;5H[?12l[?25h[?25l[48;167H3[26;5H[?12l[?25h[?25l[48;169H2[26;6H[?12l[?25h[?25l[48;169H3[26;7H[?12l[?25h[?25l[48;169H4[26;8H[?12l[?25h[?25l[48;169H5[26;9H[?12l[?25h[?25l[48;169H6[26;10H[?12l[?25h[?25l[48;169H7[26;11H[?12l[?25h[?25l[48;169H8[26;12H[?12l[?25h[?25l[48;169H9[26;13H[?12l[?25h[?25l[48;169H10[26;14H[?12l[?25h[?25l[48;170H1[26;15H[?12l[?25h[?25l[48;170H2[26;16H[?12l[?25h[?25l[48;167H4[27;16H[?12l[?25h[?25l[48;167H5[28;16H[?12l[?25h[?25l[48;167H6[29;16H[?12l[?25h[?25l[48;167H5[28;16H[?12l[?25h[?25l[48;170H3[28;17H[?12l[?25h[?25l[48;170H4[28;18H[?12l[?25h[?25l[48;170H5[28;19H[?12l[?25h[?25l[48;170H6[28;20H[?12l[?25h[?25l[48;170H7[28;21H[?12l[?25h[?25l[48;170H8[28;22H[?12l[?25h[?25l[48;170H9[28;23H[?12l[?25h[?25l[48;169H20[28;24H[?12l[?25h[?25l[48;170H1[28;25H[?12l[?25h[?25l[48;170H2[28;26H[?12l[?25h[?25l[48;170H3[28;27H[?12l[?25h[?25l[48;170H4[28;28H[?12l[?25h[?25l[48;170H5[28;29H[?12l[?25h[?25l[48;170H6[28;30H[?12l[?25h[?25l[48;170H7[28;31H[?12l[?25h[?25l[48;170H8[28;32H[?12l[?25h[?25l[48;170H9[28;33H[?12l[?25h[?25l[48;169H30[28;34H[?12l[?25h[?25l[48;170H1[28;35H[?12l[?25h[?25l[48;170H2[28;36H[?12l[?25h[?25l[48;170H3[28;37H[?12l[?25h[?25l[48;170H4[28;38H[?12l[?25h[?25l[48;170H5[28;39H[?12l[?25h[?25l[48;170H6[28;40H[?12l[?25h[?25l[48;170H7[28;41H[?12l[?25h[?25l[48;170H8[28;42H[?12l[?25h[?25l[48;170H9[28;43H[?12l[?25h[?25l[48;169H40[28;44H[?12l[?25h[?25l[48;170H1[28;45H[?12l[?25h[?25l[48;170H2[28;46H[?12l[?25h[?25l[48;170H3[28;47H[?12l[?25h[?25l[48;170H4[28;48H[?12l[?25h[?25l[48;170H5[28;49H[?12l[?25h[?25l[48;170H6[28;50H[?12l[?25h[?25l[1C[46m([23C)[m[48;170H7[28;51H[?12l[?25h[?25l([23C)[48;170H8[28;52H[?12l[?25h[?25l[48;170H9[28;53H[?12l[?25h[?25l[48;169H50[28;54H[?12l[?25h[?25l[48;170H1[28;55H[?12l[?25h[?25l[48;170H0[28;54H[?12l[?25h[?25l[48;169H49[28;53H[?12l[?25h[?25l[48;170H8[28;52H[?12l[?25h[?25l[46m([23C)[m[48;170H7[28;51H[?12l[?25h[?25l([23C)[48;170H6[28;50H[?12l[?25h[?25l[48;170H5[28;49H[?12l[?25h[?25l[48;170H4[28;48H[?12l[?25h[?25l[48;170H3[28;47H[?12l[?25h[?25l[48;170H4[28;48H[?12l[?25h[?25l[48;170H5[28;49H[?12l[?25h[?25l[48;170H6[28;50H[?12l[?25h[?25l[1C[46m([23C)[m[48;170H7[28;51H[?12l[?25h[?25l([23C)[48;170H8[28;52H[?12l[?25h[?25l[48;170H9[28;53H[?12l[?25h[?25l[48;169H50[28;54H[?12l[?25h[?25l[48;170H1[28;55H[?12l[?25h[?25l[48;170H2[28;56H[?12l[?25h[?25l[48;170H3[28;57H[?12l[?25h[?25l[48;170H4[28;58H[?12l[?25h[?25l[48;170H5[28;59H[?12l[?25h[?25l[48;170H6[28;60H[?12l[?25h[?25l[48;170H7[28;61H[?12l[?25h[?25l[48;165H[K[48;1H:[?12l[?25hw[?25l[?12l[?25hq[?25l[?12l[?25h[?25l"tag_position.py" 124L, 5953C 書込み]2;indigo@indigo-VirtualBox: ~/catkin_ws/src/worker_pkg/scripts]1;indigo@indigo-VirtualBox: ~/catkin_ws/src/worker_pkg/scripts
+[?1l>[?12l[?25h[?1049l]0;indigo@indigo-VirtualBox: ~/catkin_ws/src/worker_pkg/scriptsindigo@indigo-VirtualBox:~/catkin_ws/src/worker_pkg/scripts$ vi tag_position.py ls[Kcd scripts/ls[Kroslaunch usb_cam usb_cam-test.launch 
+... logging to /home/indigo/.ros/log/e26c684c-43d8-11e8-af31-0800274d6b49/roslaunch-indigo-VirtualBox-7098.log
+Checking log directory for disk usage. This may take awhile.
+Press Ctrl-C to interrupt
+Done checking log file disk usage. Usage is <1GB.
+]2;/home/indigo/catkin_ws/src/usb_cam/launch/usb_cam-test.launch
+[1mstarted roslaunch server http://192.168.11.19:58643/[0m
+
+SUMMARY
+========
+
+PARAMETERS
+ * /rosdistro: indigo
+ * /rosversion: 1.11.21
+ * /usb_cam/camera_frame_id: usb_cam
+ * /usb_cam/camera_info_url: package://usb_cam...
+ * /usb_cam/image_height: 720
+ * /usb_cam/image_width: 1280
+ * /usb_cam/io_method: mmap
+ * /usb_cam/pixel_format: mjpeg
+ * /usb_cam/video_device: /dev/video0
+
+NODES
+  /
+    usb_cam (usb_cam/usb_cam_node)
+
+auto-starting new master
+[1mprocess[master]: started with pid [7110][0m
+[1mROS_MASTER_URI=http://192.168.11.19:11311[0m
+]2;/home/indigo/catkin_ws/src/usb_cam/launch/usb_cam-test.launch http://192.168.11.19:11311
+[1msetting /run_id to e26c684c-43d8-11e8-af31-0800274d6b49[0m
+[1mprocess[rosout-1]: started with pid [7123][0m
+started core service [/rosout]
+[1mprocess[usb_cam-2]: started with pid [7132][0m
+[0m[ INFO] [1524145943.109274954]: camera calibration URL: package://usb_cam/camera_info/head_camera.yaml[0m
+[0m[ INFO] [1524145943.110278830]: Starting 'head_camera' (/dev/video0) at 1280x720 via mmap (mjpeg) at 30 FPS[0m
+^C[usb_cam-2] killing on exit
+[rosout-1] killing on exit
+[master] killing on exit
+shutting down processing monitor...
+... shutting down processing monitor complete
+[1mdone[0m
+]0;indigo@indigo-VirtualBox: ~/catkin_ws/src/worker_pkg/scriptsindigo@indigo-VirtualBox:~/catkin_ws/src/worker_pkg/scripts$ clear
+[H[2J]0;indigo@indigo-VirtualBox: ~/catkin_ws/src/worker_pkg/scriptsindigo@indigo-VirtualBox:~/catkin_ws/src/worker_pkg/scripts$ clearroslaunch usb_cam usb_cam-test.launch [19Pvi tag_position.py[Cls[Kvi tag_position.py [19@roslaunch usb_cam usb_cam-test.launch[Cclear[Kroslaunch usb_cam usb_cam-test.launch [19Pvi tag_position.py[Cls[K[K[Kroslaunch apriltags[K[K[K[K[K[K[K[K[Kworker_pkg apriltag2_setup.launch 
+... logging to /home/indigo/.ros/log/eb956b3a-43d8-11e8-acac-0800274d6b49/roslaunch-indigo-VirtualBox-7333.log
+Checking log directory for disk usage. This may take awhile.
+Press Ctrl-C to interrupt
+Done checking log file disk usage. Usage is <1GB.
+]2;/home/indigo/catkin_ws/src/worker_pkg/launch/apriltag2_setup.launch
+[1mstarted roslaunch server http://192.168.11.19:59663/[0m
+
+SUMMARY
+========
+
+CLEAR PARAMETERS
+ * /apriltags2_ros_continuous_node/
+
+PARAMETERS
+ * /apriltags2_ros_continuous_node/camera_frame: usb_cam
+ * /apriltags2_ros_continuous_node/publish_tag_detections_image: True
+ * /apriltags2_ros_continuous_node/publish_tf: True
+ * /apriltags2_ros_continuous_node/standalone_tags: [{'size': 0.11, '...
+ * /apriltags2_ros_continuous_node/tag_blur: 0.0
+ * /apriltags2_ros_continuous_node/tag_border: 1
+ * /apriltags2_ros_continuous_node/tag_bundles: []
+ * /apriltags2_ros_continuous_node/tag_debug: 0
+ * /apriltags2_ros_continuous_node/tag_decimate: 1.0
+ * /apriltags2_ros_continuous_node/tag_family: tag36h11
+ * /apriltags2_ros_continuous_node/tag_refine_decode: 0
+ * /apriltags2_ros_continuous_node/tag_refine_edges: 1
+ * /apriltags2_ros_continuous_node/tag_refine_pose: 0
+ * /apriltags2_ros_continuous_node/tag_threads: 2
+ * /rosdistro: indigo
+ * /rosversion: 1.11.21
+ * /usb_cam/camera_frame_id: usb_cam
+ * /usb_cam/camera_info_url: package://usb_cam...
+ * /usb_cam/image_height: 720
+ * /usb_cam/image_width: 1280
+ * /usb_cam/io_method: mmap
+ * /usb_cam/pixel_format: mjpeg
+ * /usb_cam/video_device: /dev/video0
+
+NODES
+  /
+    apriltags2_ros_continuous_node (apriltags2_ros/apriltags2_ros_continuous_node)
+    rviz (rviz/rviz)
+    usb_cam (usb_cam/usb_cam_node)
+
+auto-starting new master
+[1mprocess[master]: started with pid [7345][0m
+[1mROS_MASTER_URI=http://192.168.11.19:11311[0m
+]2;/home/indigo/catkin_ws/src/worker_pkg/launch/apriltag2_setup.launch http://192.168.11.19:11311
+[1msetting /run_id to eb956b3a-43d8-11e8-acac-0800274d6b49[0m
+[1mprocess[rosout-1]: started with pid [7358][0m
+started core service [/rosout]
+[1mprocess[usb_cam-2]: started with pid [7363][0m
+[1mprocess[apriltags2_ros_continuous_node-3]: started with pid [7368][0m
+[1mprocess[rviz-4]: started with pid [7378][0m
+[0m[ INFO] [1524145958.527763458]: Loaded tag config: 0, size: 0.11, frame_name: tag0[0m
+[0m[ INFO] [1524145958.527829706]: Loaded tag config: 1, size: 0.11, frame_name: tag1[0m
+[0m[ INFO] [1524145958.694750200]: camera calibration URL: package://usb_cam/camera_info/head_camera.yaml[0m
+[0m[ INFO] [1524145958.695761158]: Starting 'head_camera' (/dev/video0) at 1280x720 via mmap (mjpeg) at 30 FPS[0m
+^C[rviz-4] killing on exit
+[apriltags2_ros_continuous_node-3] killing on exit
+[usb_cam-2] killing on exit
+[rosout-1] killing on exit
+[master] killing on exit
+shutting down processing monitor...
+... shutting down processing monitor complete
+[1mdone[0m
+]0;indigo@indigo-VirtualBox: ~/catkin_ws/src/worker_pkg/scriptsindigo@indigo-VirtualBox:~/catkin_ws/src/worker_pkg/scripts$ ls
+[0m[01;32mjoy_twist.py[0m  [01;32mtag_position.py[0m
+]0;indigo@indigo-VirtualBox: ~/catkin_ws/src/worker_pkg/scriptsindigo@indigo-VirtualBox:~/catkin_ws/src/worker_pkg/scripts$ clear
+[H[2J]0;indigo@indigo-VirtualBox: ~/catkin_ws/src/worker_pkg/scriptsindigo@indigo-VirtualBox:~/catkin_ws/src/worker_pkg/scripts$ s
+s: コマンドが見つかりません
+]0;indigo@indigo-VirtualBox: ~/catkin_ws/src/worker_pkg/scriptsindigo@indigo-VirtualBo

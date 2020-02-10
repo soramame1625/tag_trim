@@ -1,0 +1,47 @@
+<!-- xml -->
+<launch>
+
+  <arg name="machine_master" default="ketantu" />
+  <arg name="machine_child_0" default="odroid-miniworker0" />
+  <arg name="machine_child_1" default="odroid-miniworker1" />
+  <arg name="machine_child_2" default="odroid-miniworker2" />
+  <arg name="machine_child_3" default="odroid-miniworker3" />
+  <arg name="machine_deka_0" default="wanglab-GIGA" />
+
+  <!-- Machine setup -->
+  <machine name="$(arg machine_master)"
+    address="$(env ROS_HOSTNAME)"
+    timeout="90" />
+  <machine name="$(arg machine_child_0)"
+    address="$(arg machine_child_0).local"
+    user="odroid"
+    password="odroid"
+    env-loader="/home/odroid/remote_env.bash"
+    timeout="90" />
+  <machine name="$(arg machine_child_1)"
+    address="$(arg machine_child_1).local"
+    user="odroid"
+    password="odroid"
+    env-loader="/home/odroid/remote_env.bash"
+    timeout="60" />
+  <machine name="$(arg machine_child_2)"
+    address="$(arg machine_child_2).local"
+    user="odroid"
+    password="odroid"
+    env-loader="/home/odroid/remote_env.bash"
+    timeout="60" />
+  <machine name="$(arg machine_child_3)"
+    address="$(arg machine_child_3).local"
+    user="odroid"
+    password="odroid"
+    env-loader="/home/odroid/remote_env.bash"
+    timeout="90" />
+
+  <machine name="$(arg machine_deka_0)"
+    address="$(arg machine_deka_0).local"
+    user="wanglab_giga"
+    password="wanglab"
+    env-loader="/home/wanglab_giga/remote_env.bash"
+    timeout="20" />
+
+</launch>
