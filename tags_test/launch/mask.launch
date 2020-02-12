@@ -11,7 +11,7 @@
     <param name="framerate" value="60" />
   </node>
 
-  <node name="trimming_image" pkg="opencv" type="mask_test.py"/>
+  <node name="trimming_image" pkg="opencv" type="mask.py"/>
 
 
   <arg name="launch_prefix" default="" /> <!-- set to value="gdbserver localhost:10000" for remote debugging -->

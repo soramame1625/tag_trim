@@ -10,6 +10,7 @@ from apriltag_ros.msg import AprilTagDetectionArray
 import numpy as np
 
 import tf
+import math
 from geometry_msgs.msg import Vector3
 
 class camera_read:
@@ -27,8 +28,9 @@ class camera_read:
 		ts = message_filters.ApproximateTimeSynchronizer([sub1,sub2], 1, 0.5)
 		ts.registerCallback(self.image_callback)
 
-		self.tag_pos = 0
-		self.tag_pos_l = 0
+		self.tag_pos = AprilTagDetectionPositionArray
+		self.tag_pos_l = AprilTagDetectionPositionArray
+		self.tag_pos_p = [0,0]
 		self.xy = [0,720,0,1280]
 		self.xy_l = [0,0,0,0]
 		self.fg1 = 0
@@ -45,7 +47,7 @@ class camera_read:
 
 		self.tag_ori = [0,0,0]
 		self.color = (0,0,0)
-		self.k2 = 40
+		self.k2 = 100
 		self.xy_c = [0,0,0,0]
 
 		self.around = 0
@@ -68,22 +70,17 @@ class camera_read:
 	def tag_pos_callback(self,data):
 		#try:
 		if len(data.detect_positions) >= 1:
+			self.tag_pos_l = self.tag_pos
 			self.tag_pos = data
+			self.tag_pos_p = [self.tag_pos.detect_positions[0].x + (self.tag_pos.detect_positions[0].x - self.tag_pos_l.detect_positions[0].x), self.tag_pos.detect_positions[0].y + (self.tag_pos.detect_positions[0].y - self.tag_pos_l.detect_positions[0].y)]
 			self.around = float(self.tag_det.detections[0].size[0]) * self.k1 / float(self.tag_det.detections[0].pose.pose.pose.position.z)
-			print self.around
-			print self.tag_ori[2]
 			if self.tag_ori[2] > 0:
-				self.around = self.around * (self.tag_ori[2] + 1)
+				self.around = self.around +  self.around * math.sin(self.tag_ori[2])
 			elif self.tag_ori[2] < 0:
-				self.around = self.around * ((self.tag_ori[2] * -1) + 1)
+				self.around = self.around +  self.around * (math.sin(self.tag_ori[2]) * -1)
 			print self.around
-			self.xy = [self.tag_pos.detect_positions[0].y - int(self.around), self.tag_pos.detect_positions[0].y + int(self.around), self.tag_pos.detect_positions[0].x - int(self.around), self.tag_pos.detect_positions[0].x + int(self.around)]
-
-			#self.xy = [self.tag_pos.detect_positions[0].y - int(self.around), self.tag_pos.detect_positions[0].y + int(self.around), self.tag_pos.detect_positions[0].x - int(self.around), self.tag_pos.detect_positions[0].x + int(self.around)]
-
-
+			self.xy = [self.tag_pos_p[1] - int(self.around), self.tag_pos_p[1] + int(self.around), self.tag_pos_p[0] - int(self.around), self.tag_pos_p[0] + int(self.around)]
 			self.correction()
-			#print self.tag_pos
 
 		else:
 			#except IndexError:
@@ -98,7 +95,7 @@ class camera_read:
 		#try:
 		if len(data.detections) >= 1:
 			self.tag_det = data
-			self.tag_ori = self.q_t_e(self.tag_det.detections[0].pose.pose.pose.orientation.x,self.tag_det.detections[0].pose.pose.pose.orientation.y,self.tag_det.detections[0].pose.pose.pose.orientation.z,self.tag_det.detections[0].pose.pose.pose.orientation.w)
+			self.tag_ori = self.q_deg(self.tag_det.detections[0].pose.pose.pose.orientation.x,self.tag_det.detections[0].pose.pose.pose.orientation.y,self.tag_det.detections[0].pose.pose.pose.orientation.z,self.tag_det.detections[0].pose.pose.pose.orientation.w)
 
 
 	def correction(self):
@@ -114,17 +111,16 @@ class camera_read:
 
 		if self.tag_pos.detect_positions[0].y < self.tag_pos_l.detect_positions[0].y:
 			self.xy[0] = self.xy[0] - (self.tag_pos_l.detect_positions[0].y - self.tag_pos.detect_positions[0].y) * self.k2 / int(self.tag_det.detections[0].pose.pose.pose.position.z * 10)
-		if self.tag_pos.detect_positions[0].y > self.tag_pos_l.detect_positions[0].y:
+		elif self.tag_pos.detect_positions[0].y > self.tag_pos_l.detect_positions[0].y:
 			self.xy[1] = self.xy[1] + (self.tag_pos.detect_positions[0].y - self.tag_pos_l.detect_positions[0].y) * self.k2 / int(self.tag_det.detections[0].pose.pose.pose.position.z * 10)
-		if self.tag_pos.detect_positions[0].x < self.tag_pos_l.detect_positions[0].x:
+		elif self.tag_pos.detect_positions[0].x < self.tag_pos_l.detect_positions[0].x:
 			self.xy[2] = self.xy[2] - (self.tag_pos_l.detect_positions[0].x - self.tag_pos.detect_positions[0].x) * self.k2 / int(self.tag_det.detections[0].pose.pose.pose.position.z * 10)
-		if self.tag_pos.detect_positions[0].x > self.tag_pos_l.detect_positions[0].x:
+		elif self.tag_pos.detect_positions[0].x > self.tag_pos_l.detect_positions[0].x:
 			self.xy[3] = self.xy[3] + (self.tag_pos.detect_positions[0].x - self.tag_pos_l.detect_positions[0].x) * self.k2 / int(self.tag_det.detections[0].pose.pose.pose.position.z * 10)
 
 		print 	self.tag_det.detections[0].pose.pose.pose.position.z
-		#print self.tag_pos_l.detect_positions[0].y - self.tag_pos.detect_positions[0].y
 
-	def q_t_e(self,q_x,q_y,q_z,q_w):
+	def q_deg(self,q_x,q_y,q_z,q_w):
 		euler = tf.transformations.euler_from_quaternion((q_x, q_y, q_z, q_w))
 		euler = [euler[0], euler[1], euler[2]]
 		return euler
@@ -134,7 +130,6 @@ class camera_read:
 		trim = cv2.rectangle(frame,(0,self.xy[1]),(1280,720),self.color, -1)
 		trim = cv2.rectangle(frame,(0,0),(self.xy[2],720),self.color, -1)
 		trim = cv2.rectangle(frame,(self.xy[3],0),(1280,720),self.color, -1)
-		#trim = cv2.putText(frame,'torasuke',(self.xy[3],self.xy[1]), cv2.FONT_HERSHEY_SIMPLEX, 4,(255,255,255),2,cv2.LINE_AA)
 		result = self.bridge.cv2_to_imgmsg(trim, "bgr8")
 		return result
 
