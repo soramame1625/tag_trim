@@ -1,8 +1,9 @@
 # tag_trim　　
 - トリミング　
 
-**trimm.launch
-- マスキング　　
+**trimm.launch**
+- マスキング　
+
 **mask.launch**
     ---
     4行目　 自分が使用するカメラのパスを指定
