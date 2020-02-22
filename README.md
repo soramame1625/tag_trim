@@ -6,7 +6,7 @@
     ```
     <param name="video_device" value="/dev/video1" />　
     ```
-  
+    
 - マスキング
     **mask.launch**  
     ---
