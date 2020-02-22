@@ -1,6 +1,6 @@
 # tag_trim　　
 - トリミング　　
-**trimm.launch**
+**trimm.launch
 - マスキング　　
 **mask.launch**
     ---
