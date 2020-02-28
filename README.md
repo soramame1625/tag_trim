@@ -1,3 +1,7 @@
+```
+git cllone https://github.com/soramame1625/tag_trim.git
+```
+
 # tag_trim　　
 - トリミング　
 
@@ -5,9 +9,8 @@
 - マスキング　
 
     **mask.launch**
-    
+
     ---
     4行目　 自分が使用するカメラのパスを指定
     ```
     <param name="video_device" value="/dev/video1" />　
-    ```
