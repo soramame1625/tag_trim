@@ -4,7 +4,7 @@
 # DEMO
    
 
-```
+```bash
 git cllone https://github.com/soramame1625/tag_trim.git
 ```
 - トリミング　
