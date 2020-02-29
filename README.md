@@ -38,14 +38,3 @@ git cllone https://github.com/soramame1625/tag_trim.git
    ```
    <param name="video_device" value="/dev/video1" />　
    ```
-   
-```bash
-git clone https://github.com/hoge/~
-cd examples
-python demo.py
-```
-
-    ---
-    4行目　 自分が使用するカメラのパスを指定
-    ```
-    <param name="video_device" value="/dev/video1" />　
