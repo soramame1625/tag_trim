@@ -14,7 +14,14 @@ git cllone https://github.com/soramame1625/tag_trim.git
 
     **mask.launch**
 
-
+# 実行方法
+- ワークススペースに当パッケージをクローンします。
+   ```
+   cd catkin_ws/src
+   git clone https://github.com/soramame1625/tag_trim.git
+   ```
+   
+   
 ```bash
 git clone https://github.com/hoge/~
 cd examples
