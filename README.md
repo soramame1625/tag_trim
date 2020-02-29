@@ -20,7 +20,11 @@ git cllone https://github.com/soramame1625/tag_trim.git
    cd catkin_ws/src
    git clone https://github.com/soramame1625/tag_trim.git
    ```
-   
+ - AprilTagsパッケージをクローンします。
+   通常のAprilTagsでは実行できないので以下のものを使用してください。
+   ```
+   git clone https://github.com/soramame1625/apriltag_ros.git
+   ```
    
 ```bash
 git clone https://github.com/hoge/~
