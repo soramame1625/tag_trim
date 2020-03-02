@@ -1,5 +1,6 @@
 
 # tag_trim　　
+AprilTagsと同時に起動することでAprilTagsの認識速度を向上させることが可能です。
 
 # DEMO
    
