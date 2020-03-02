@@ -4,16 +4,6 @@
 # DEMO
    
 
-```bash
-git cllone https://github.com/soramame1625/tag_trim.git
-```
-- トリミング　
-
-    **trimm.launch**
-- マスキング　
-
-    **mask.launch**
-
 # 実行方法
 - ワークススペースに当パッケージをクローンします。
    ```
