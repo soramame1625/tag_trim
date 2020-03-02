@@ -20,12 +20,12 @@ AprilTagsと同時に起動することでAprilTagsの認識速度を向上さ�
   ```
   source ~/catkin_ws/devel/setup.bash
   ```
-- 実行前にそれぞれのlaunchファイルの4行目で使用するカメラのパスを指定する必要があります。
-  ```
-  <param name="video_device" value="/dev/video1" />　
-  ```
 - マスキングとトリミングはそれぞれ以下で実行可能です。
   ```
   roslaunch tags_test mask.launch   //マスキング
   roslaunch tags_test trim.launch   //トリミング
+  ```
+- 実行前にそれぞれのlaunchファイルの4行目で使用するカメラのパスを指定する必要があります。
+  ```
+  <param name="video_device" value="/dev/video1" />　
   ```
